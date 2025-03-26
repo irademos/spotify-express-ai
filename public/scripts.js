@@ -13,20 +13,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchResultsList = document.getElementById('searchResultsList');
     const selectedPlaylistsList = document.getElementById('selectedPlaylistsList');
     const selectedPlaylists = [];
+
+    fetch('/api/config')
+    .then(response => response.json())
+    .then(config => {
+        const loginButton = document.getElementById('loginButton');
+        if (loginButton) {
+            loginButton.addEventListener('click', () => {
+                const CLIENT_ID = config.client_id;
+                const REDIRECT_URI = config.redirect_uri;
+                const SCOPES = 'user-library-read user-read-private playlist-read-private playlist-modify-private playlist-modify-public';
+
+                const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+                window.location.href = authUrl;
+            });
+        } else {
+            console.error("Login button not found!");
+        }
+    })
+    .catch(error => console.error('Error fetching config:', error));
+
     
-    if (loginButton) {
-        loginButton.addEventListener('click', () => {
-            // Construct Spotify authentication URL
-            const CLIENT_ID = '80e4dfcd44b147b8a159f4073ccea635'; // Replace with your Spotify client ID
-            const REDIRECT_URI = 'http://localhost:3000/callback'; // Replace with your redirect URI
-            const SCOPES = 'user-library-read user-read-private playlist-read-private playlist-modify-private playlist-modify-public';
+    // if (loginButton) {
+    //     loginButton.addEventListener('click', () => {
+    //         // Construct Spotify authentication URL
+    //         const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID; // Replace with your Spotify client ID
+    //         const REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI; // Replace with your redirect URI
+    //         const SCOPES = 'user-library-read user-read-private playlist-read-private playlist-modify-private playlist-modify-public';
             
-            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
-            window.location.href = authUrl; // Redirect to Spotify login page
-        });
-    } else {
-        console.error("Login button not found!");
-    }
+    //         const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+    //         window.location.href = authUrl; // Redirect to Spotify login page
+    //     });
+    // } else {
+    //     console.error("Login button not found!");
+    // }
 
     // Function to fetch playlists from the Spotify API
     function searchPlaylists(query) {

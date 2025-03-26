@@ -12,6 +12,13 @@ app.use(cookieParser());
 // Create application/x-www-form-urlencoded parser
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+app.get('/api/config', (req, res) => {
+    res.json({
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        redirect_uri: process.env.SPOTIFY_REDIRECT_URI
+    });
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Serve static files
 
 // Route for serving home.htm
