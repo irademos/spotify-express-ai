@@ -1,10 +1,4 @@
 {
 	"version": 2,
-	"rewrites": [
-	  { "source": "/(.*)", "destination": "/api" }
-	],
-	"static": {
-	  "public": "./public"
-	}
-  }
-  
+	"rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}
