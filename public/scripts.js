@@ -205,11 +205,12 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedPlaylistsList.innerHTML = ''; // Clear the list
 
         selectedPlaylists.forEach(playlist => {
-        const listItem = document.createElement('li');
-        listItem.textContent = playlist.name;
-        selectedPlaylistsList.appendChild(listItem);
+            const listItem = document.createElement('li');
+            listItem.textContent = `${playlist.name} (${playlist.owner.display_name})`;
+            selectedPlaylistsList.appendChild(listItem);
         });
     }
+
 
     // Event listener for the search input
     searchInput.addEventListener('input', function (e) {
