@@ -47,39 +47,45 @@ app.get('/dashboard', function (req, res) {
           <!DOCTYPE html>
           <html lang="en">
           <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Spotify Playlist Creator</title>
-            <link rel="stylesheet" href="/styles.css">
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Spotify Playlist Creator</title>
+              <link rel="stylesheet" href="/styles.css">
           </head>
           <body>
-            <div>
-              <h1>Spotify Playlist Creator</h1>
-              <p>Welcome, <span id="userDisplayName">${data.display_name}</span></p>
-  
-              <!-- Playlist search and selection -->
-              <div id="content"></div>
-  
-              <div id="mainContentTemplate">
-                <input type="text" id="playlistSearchInput" placeholder="Search Playlists" />
-                <ul id="searchResultsList"></ul>
-  
-                <h3>Selected Playlists:</h3>
-                <ul id="selectedPlaylistsList"></ul>
-  
-                <h3>Frequency:</h3>
-                <label><input type="radio" name="frequency" value="daily" /> Daily</label>
-                <label><input type="radio" name="frequency" value="weekly" /> Weekly</label>
-                <label><input type="radio" name="frequency" value="monthly" /> Monthly</label>
-  
-                <input type="text" id="newPlaylistNameInput" placeholder="New Playlist Name">
-                <button id="createPlaylistButton">Create Playlist</button>
+              <div>
+                  <h1>Spotify Playlist Creator</h1>
+                  <p>Welcome, <span id="userDisplayName">${data.display_name}</span></p>
+
+                  <!-- Playlist search and selection -->
+                  <div id="content"></div>
+
+                  <div id="mainContentTemplate">
+                      <input type="text" id="playlistSearchInput" placeholder="Search Playlists" />
+                      <ul id="searchResultsList"></ul>
+
+                      <h3>Selected Playlists:</h3>
+                      <ul id="selectedPlaylistsList"></ul>
+
+                      <h3>Frequency:</h3>
+                      <label><input type="radio" name="frequency" value="daily" /> Daily</label>
+                      <label><input type="radio" name="frequency" value="weekly" /> Weekly</label>
+                      <label><input type="radio" name="frequency" value="monthly" /> Monthly</label>
+
+                      <input type="text" id="newPlaylistNameInput" placeholder="New Playlist Name">
+                      <button id="createPlaylistButton">Create Playlist</button>
+
+                      <!-- Upload and Download Buttons -->
+                      <h3>Manage Playlist Settings:</h3>
+                      <button id="downloadFileButton">Download Settings</button>
+                      <input type="file" id="uploadFileInput" />
+                  </div>
+
+                  <script src="/scripts.js"></script>
               </div>
-  
-              <script src="/scripts.js"></script>
-            </div>
           </body>
           </html>
+
         `);
       })
       .catch(error => {

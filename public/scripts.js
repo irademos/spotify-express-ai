@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('playlistSearchInput');
     const searchResultsList = document.getElementById('searchResultsList');
     const selectedPlaylistsList = document.getElementById('selectedPlaylistsList');
-    const selectedPlaylists = [];
+    let selectedPlaylists = [];
 
     fetch('/api/config')
     .then(response => response.json())
@@ -32,43 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => console.error('Error fetching config:', error));
 
-    // Function to fetch playlists from the Spotify API
-    function searchPlaylists(query) {
-        const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
-        if (!accessToken || !query) return;
-
-        fetch(`https://api.spotify.com/v1/search?q=${query}&type=playlist&limit=5`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-        })
-        .then(response => response.json())
-        .then(data => {
-        // Clear previous results
-        searchResultsList.innerHTML = '';
-
-        // Display new search results
-        const playlists = data.playlists.items;
-        playlists.forEach(playlist => {
-            const listItem = document.createElement('li');
-            listItem.textContent = playlist.name;
-            listItem.onclick = () => addToSelectedPlaylists(playlist);
-            searchResultsList.appendChild(listItem);
-        });
-        })
-        .catch(error => console.error('Error searching playlists:', error));
-    }
-
-
-
     function searchPublicPlaylists(query) {
         const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
         if (!accessToken || !query) return;
     
         console.log(encodeURIComponent(query));
         fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`, {
-        // fetch(`https://api.spotify.com/v1/search?offset=0&limit=20&query=Discover%20Weekly&type=playlist&locale=en-US,en;q%3D0.9`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -77,93 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.playlists) {
-                // const filteredPlaylists = data.playlists.items.filter(playlist => 
-                // {
-                //     if (playlist) {
-                //         playlist.name.toLowerCase().includes(query.toLowerCase());
-                //     }
-                // }
-                // );
-                // displayPlaylists(filteredPlaylists, `Public Playlists: ${query}`);
                 displayPlaylists(data.playlists.items, `Public Playlists: ${query}`);
             }
         })
         .catch(error => console.error('Error searching public playlists:', error));
     }
-
-    function searchFeaturedPlaylists(query) {
-        const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
-        if (!accessToken) return;
-    
-        fetch('https://api.spotify.com/v1/browse/featured-playlists?limit=10', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.playlists) {
-                const filteredPlaylists = data.playlists.items.filter(playlist => 
-                    playlist.name.toLowerCase().includes(query.toLowerCase())
-                );
-                displayPlaylists(filteredPlaylists, `Featured Playlists: ${query}`);
-            }
-        })
-        .catch(error => console.error('Error fetching featured playlists:', error));
-    }
-
-
-    // app.post("/search-playlists", async (req, res) => {
-    //     const { token, query } = req.body;
-    
-    //     try {
-    //         const response = await axios.get(
-    //             `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`,
-    //             {
-    //                 headers: { Authorization: `Bearer ${token}` },
-    //             }
-    //         );
-    
-    //         res.json(response.data.playlists.items);
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.response.data });
-    //     }
-    // });
-    
-    function searchUserPlaylists(query) {
-        const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
-        if (!accessToken) return;
-    
-        fetch('https://api.spotify.com/v1/me/playlists?limit=50', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.items) {
-                const filteredPlaylists = data.items.filter(playlist => 
-                    playlist.name.toLowerCase().includes(query.toLowerCase())
-                );
-                displayPlaylists(filteredPlaylists, `Your Playlists: ${query}`);
-            }
-        })
-        .catch(error => console.error('Error fetching user playlists:', error));
-    }    
     
     function displayPlaylists(playlists, category) {
         if (!playlists || playlists.length === 0) return;
-    
-        // const categoryHeader = document.createElement('h3');
-        // categoryHeader.textContent = category;
-        // searchResultsList.appendChild(categoryHeader);
-
-        // Display new search results
-        // const playlists = data.playlists.items;
-
-        // if (playlists.length > 8) return;
     
         playlists.forEach(playlist => {
             if (playlist) {
@@ -174,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     listItem.textContent = playlist.name;
                     listItem.onclick = () => addToSelectedPlaylists(playlist);
                     searchResultsList.appendChild(listItem);
-                    console.log(listItem.textContent);
                 }
             }
         });
@@ -184,19 +73,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function searchAllPlaylists(query) {
         searchResultsList.innerHTML = ''; // Clear previous results
         searchPublicPlaylists(query);
-        // searchFeaturedPlaylists(query);
-        // searchUserPlaylists(query);
     }
     
-    
-    
-
-
     // Function to add a playlist to the selected playlists list
     function addToSelectedPlaylists(playlist) {
         if (!selectedPlaylists.some(p => p.id === playlist.id)) {
-        selectedPlaylists.push(playlist);
-        updateSelectedPlaylists();
+            selectedPlaylists.push(playlist);
+            updateSelectedPlaylists();
         }
     }
 
@@ -211,12 +94,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
     // Event listener for the search input
     searchInput.addEventListener('input', function (e) {
         const query = e.target.value;
         searchAllPlaylists(query); // Perform search as user types
     });
+
+    // Function to download selected playlists as a JSON file
+    function downloadSelectedPlaylists() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedPlaylists, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "selected_playlists.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+    }
+
+    // Function to handle file upload
+    function uploadSelectedPlaylists(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                selectedPlaylists = JSON.parse(e.target.result) || [];
+                updateSelectedPlaylists();
+            } catch (error) {
+                console.error("Error parsing uploaded file:", error);
+            }
+        };
+        reader.readAsText(file);
+    }
 
     async function createPlaylist() {
         const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
@@ -315,6 +225,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Attach to button
+    // Event listeners for buttons
+    document.getElementById("downloadFileButton").addEventListener("click", downloadSelectedPlaylists);
+    document.getElementById("uploadFileInput").addEventListener("change", uploadSelectedPlaylists);
     document.getElementById('createPlaylistButton')?.addEventListener('click', createPlaylist);    
 
 });
