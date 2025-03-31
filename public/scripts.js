@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const accessToken = document.cookie.match(/spotifyAccessToken=([^;]+)/)?.[1];
         if (!accessToken || !query) return;
     
-        console.log(encodeURIComponent(query));
         fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`, {
             method: 'GET',
             headers: {
@@ -54,14 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function displayPlaylists(playlists, category) {
         if (!playlists || playlists.length === 0) return;
-    
+        searchResultsList.innerHTML = ''; // Clear previous results
         playlists.forEach(playlist => {
             if (playlist) {
                 // Check if the playlist already exists in the search results
                 const existingItems = [...searchResultsList.children].map(item => item.textContent);
                 if (!existingItems.includes(playlist.name)) {
                     const listItem = document.createElement('li');
-                    listItem.textContent = playlist.name;
+                    listItem.textContent = `${playlist.name} (${playlist.owner.display_name})`;
                     listItem.onclick = () => addToSelectedPlaylists(playlist);
                     searchResultsList.appendChild(listItem);
                 }
@@ -71,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function searchAllPlaylists(query) {
-        searchResultsList.innerHTML = ''; // Clear previous results
+        // searchResultsList.innerHTML = ''; // Clear previous results
         searchPublicPlaylists(query);
     }
     
@@ -90,8 +89,18 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedPlaylists.forEach(playlist => {
             const listItem = document.createElement('li');
             listItem.textContent = `${playlist.name} (${playlist.owner.display_name})`;
+            
+            // Add click event to remove playlist from the list
+            listItem.onclick = () => removeFromSelectedPlaylists(playlist);
+            
             selectedPlaylistsList.appendChild(listItem);
         });
+    }
+
+    // Function to remove a playlist from selected playlists
+    function removeFromSelectedPlaylists(playlist) {
+        selectedPlaylists = selectedPlaylists.filter(p => p.id !== playlist.id);
+        updateSelectedPlaylists(); // Update UI after removal
     }
 
     // Event listener for the search input
